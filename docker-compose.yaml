@@ -1,0 +1,19 @@
+version: '3.8'
+
+volumes:
+  minio_data:
+
+services:
+  minio:
+    image: minio/minio:latest
+    env_file: img_cloud/.env
+    container_name: minio
+    command: server /data --console-address :9001
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ACCESS_KEY: ${ACCESS_KEY_MINIO}
+      MINIO_SECRET_KEY: ${SECRET_KEY_MINIO}
+    volumes:
+      - minio_data:/data
