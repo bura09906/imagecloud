@@ -47,5 +47,12 @@
     http://127.0.0.1:9001
     username, password значения указзаные вами в .env
     название Bucket = imgcloud
-8. Тесты запускаются из корня проекта командой pytest
-9. При получении ссылки на изображение объекта Avatar через Postman, что бы получить само изображение необходимо указать AuthType = AWS Signature; AccessKey, SecretKey = значения указанные вами в .env; указать Service Name = s3
+8. Применить миграции. Запустить сервер Django:
+    ```
+    python manage.py migrate
+
+    python manage.py runserver
+    ```
+
+9. Тесты запускаются из корня проекта командой pytest
+10. При получении ссылки на изображение объекта Avatar через Postman, что бы получить само изображение необходимо указать AuthType = AWS Signature; AccessKey, SecretKey = значения указанные вами в .env; указать Service Name = s3
