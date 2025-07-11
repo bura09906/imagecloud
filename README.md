@@ -34,5 +34,18 @@
    ```
    pip install -r requirements.txt
    ```
-5. Создаnm файл .env в корне проекта и добавьте туда:
-   
+5. Создать файл .env в корне проекта и добавьте туда:
+   ```
+   ACCESS_KEY_MINIO=minioadmin
+   SECRET_KEY_MINIO=miniopassword
+   ```
+6. Запустить контейнер с MinIO:
+    ```
+    docker compose up
+    ```
+7. Перейти в админ-зону MinIO, залогинится, создать Bucket
+    http://127.0.0.1:9001
+    username, password значения указзаные вами в .env
+    название Bucket = imgcloud
+8. Тесты запускаются из корня проекта командой pytest
+9. При получении ссылки на изображение объекта Avatar через Postman, что бы получить само изображение необходимо указать AuthType = AWS Signature; AccessKey, SecretKey = значения указанные вами в .env; указать Service Name = s3
