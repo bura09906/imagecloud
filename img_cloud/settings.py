@@ -68,7 +68,7 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER', 'django'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', 5432)
+        'PORT': os.getenv('DB_PORT', 5432),
     }
 }
 
@@ -102,9 +102,6 @@ STATIC_URL = 'static/'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-DB_MAX_LEN_NAME_FIELD = 32
 
 
 STORAGES = {

@@ -1,7 +1,8 @@
-from rest_framework import serializers
 from djoser.serializers import UserSerializer as DjoserUserSerializer
+from rest_framework import serializers
+
 from api.utils import ImageProcessor
-from users.models import UserProfile, Avatar
+from users.models import Avatar, UserProfile
 
 
 class AvatarSerializer(serializers.ModelSerializer):

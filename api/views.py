@@ -1,15 +1,15 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import status, permissions
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
-from djoser.views import UserViewSet as DjoserUserViewSet
 from django.db import transaction
-
-from .serializers import AvatarSerializer, AvatarReadOnlySerializer
-from .tasks import delete_image_s3
+from django.shortcuts import get_object_or_404
+from djoser.views import UserViewSet as DjoserUserViewSet
+from rest_framework import permissions, status
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 
 from users.models import Avatar, UserProfile
+
+from .serializers import AvatarReadOnlySerializer, AvatarSerializer
+from .tasks import delete_image_s3
 
 
 class ProfileViewSet(DjoserUserViewSet):
@@ -63,7 +63,8 @@ class ProfileViewSet(DjoserUserViewSet):
     @action(
         methods=['delete'],
         detail=False,
-        url_path=r'me/avatar/(?P<id>\d+)'
+        url_path=r'me/avatar/(?P<id>\d+)',
+        permission_classes=[permissions.IsAuthenticated],
     )
     def destroy_avatar(self, request, id=None):
         avatar = get_object_or_404(Avatar, id=id, user=request.user)
