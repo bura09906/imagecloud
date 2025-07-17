@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -22,7 +23,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'avatar',
+    'rest_framework',
+    'djoser',
+    'users',
     'api',
     'storages',
 ]
@@ -60,8 +63,12 @@ WSGI_APPLICATION = 'img_cloud.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'django'),
+        'USER': os.getenv('POSTGRES_USER', 'django'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', 5432)
     }
 }
 
@@ -97,7 +104,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-DB_MAX_LEN_NAME_FEILD = 32
+DB_MAX_LEN_NAME_FIELD = 32
 
 
 STORAGES = {
@@ -109,11 +116,48 @@ STORAGES = {
             'bucket_name': 'imgcloud',
             'default_acl': 'public-read',
             'querystring_auth': False,
-            'file_overwrite': True,
+            'file_overwrite': False,
             'location': 'media',
-            'endpoint_url': 'http://localhost:9000',
+            'endpoint_url': 'http://minio:9000',
             'use_ssl': False,
             'verify': False,
         },
     },
 }
+
+
+AUTH_USER_MODEL = 'users.UserProfile'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+
+DJOSER = {
+    'HIDE_USERS': False,
+    "TOKEN_MODEL": None,
+    'SERIALIZERS': {
+        'user': 'api.serializers.ProfileSerializer',
+        'current_user': 'api.serializers.ProfileSerializer',
+    },
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+        'user_list': ['rest_framework.permissions.IsAuthenticated'],
+    },
+}
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'

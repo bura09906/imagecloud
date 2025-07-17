@@ -1,32 +1,49 @@
 from rest_framework import serializers
-
-from avatar.models import Avatar
-from avatar.utils import ImageProcessor
+from djoser.serializers import UserSerializer as DjoserUserSerializer
+from api.utils import ImageProcessor
+from users.models import UserProfile, Avatar
 
 
 class AvatarSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Avatar
-        fields = ('name', 'image')
+        fields = ('user', 'image',)
 
-    def process_image(self, name, image):
-        return ImageProcessor(name=name, image=image).process()
+    def process_image(self, user, image):
+        return ImageProcessor(user=user, image=image).process()
 
     def create(self, validated_data):
-        name = validated_data['name']
+        user = validated_data['user']
         image = validated_data['image']
-        processed_file = self.process_image(name, image)
+
+        processed_file = self.process_image(user, image)
+
         validated_data['image'] = processed_file
+        validated_data['active'] = True
         return super().create(validated_data)
 
-    def update(self, instance, validated_data):
-        image = validated_data.get('image', None)
 
-        if image:
-            instance.image.delete(save=False)
-            name = validated_data.get('name', instance.name)
-            processed_file = processed_file = self.process_image(name, image)
-            validated_data['image'] = processed_file
+class ProfileSerializer(DjoserUserSerializer):
+    avatars = serializers.SerializerMethodField()
 
-        return super().update(instance, validated_data)
+    class Meta:
+        model = UserProfile
+        fields = DjoserUserSerializer.Meta.fields + ('avatars',)
+        read_only_fields = fields
+
+    def get_avatars(self, obj):
+        avatar = obj.active_avatar
+        if avatar:
+            serializer = AvatarSerializer(avatar)
+            return serializer.data
+
+
+class AvatarReadOnlySerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Avatar
+        fields = ('id', 'image', 'user')
+        read_only_fields = ('id', 'image', 'user')

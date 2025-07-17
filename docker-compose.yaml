@@ -2,6 +2,8 @@ version: '3.8'
 
 volumes:
   minio_data:
+  redis_data:
+  pg_data:
 
 services:
   minio:
@@ -17,3 +19,36 @@ services:
       MINIO_SECRET_KEY: ${SECRET_KEY_MINIO}
     volumes:
       - minio_data:/data
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+     - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+  
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+
+  db:
+    image: postgres:13.10
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: img_cloud
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - minio
+      - db

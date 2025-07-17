@@ -6,8 +6,8 @@ from PIL import Image
 
 class ImageProcessor:
 
-    def __init__(self, name, image, size=512, quality=85):
-        self.name_avatar = name
+    def __init__(self, user, image, size=512, quality=85):
+        self.avatar_user = user
         self.image = image
         self.size = size
         self.quality = quality
@@ -38,4 +38,4 @@ class ImageProcessor:
         img = img.convert("RGB")
         buffer = BytesIO()
         img.save(buffer, format='JPEG', quality=self.quality)
-        return ContentFile(buffer.getvalue(), name=f'{self.name_avatar}.jpg')
+        return ContentFile(buffer.getvalue(), name=f'{self.avatar_user}.jpg')
